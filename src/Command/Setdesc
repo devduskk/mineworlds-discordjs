@@ -1,0 +1,32 @@
+const Command = require('../structures/Command');
+const { MessageEmbed } = require('discord.js');
+const db = require('quick.db');
+
+module.exports = class extends Command {
+
+    constructor(...args) {
+        super(...args, {
+            aliases: ['setdesc'],
+            enabled: true,
+            description: 'Command used to enter your profile description.',
+            category: 'Utility',
+            usage: '\`setdesc\`',
+            guildOnly: false,
+            ownerOnly: false,
+            nsfw: false,
+            args: false,
+            cooldown: 5000
+        })
+    }
+
+    async run(message, args) {
+        message.delete();
+
+        var profileDescription = args.join(" ");
+        message.channel.send(`Success! Your profile description has been set correctly.`).then(async (msg) => {
+            await msg.delete({ timeout: 5 * 1000 });
+        });
+        
+        db.set(`setdesc_${message.author.id}`, profileDescription);
+    }
+}

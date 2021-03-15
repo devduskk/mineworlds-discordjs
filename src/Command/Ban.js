@@ -1,7 +1,8 @@
-const Command = require('../structures/Command');
-const { MessageEmbed } = require('discord.js');
-const { orange } = require('../../config.json');
-const { promptMessage } = require("../../functions.js");
+const Command = require('../structures/Command'),
+    { MessageEmbed } = require('discord.js'),
+    { orange } = require('../../config.json'),
+    { promptMessage } = require("../../functions.js"),
+    settings = require('quick.db');
 
 module.exports = class extends Command {
 
@@ -9,14 +10,8 @@ module.exports = class extends Command {
         super(...args, {
             aliases: ['ban'],
             enabled: true,
-            description: 'Command used to ban a user from the server.',
-            category: 'Moderative',
-            usage: '\`ban\`',
             guildOnly: false,
             ownerOnly: false,
-            nsfw: false,
-            args: false,
-            cooldown: 5000
         })
     }
 
@@ -24,47 +19,47 @@ module.exports = class extends Command {
         message.delete();
 
         if (!message.member.hasPermission("BAN_MEMBERS")) {
-            return message.reply("you are not allowed to use this command.")
+            return message.reply("você não tem permissão para utilizar este comando.")
                 .then(m => m.delete(5000));
         
         }
 
-        let Channel = message.guild.channels.cache.find(chan => chan.id === "CHANNEL ID HERE")
+        let Channel = message.guild.channels.cache.find(chan => chan.id === "799406316719308844")
         let Avatar = this.client.user.displayAvatarURL({ dynamic: true })
 
         let User = message.mentions.members.first() || message.guild.members.get(args[0]);
         if (!User) {
-            return message.reply("user not found.")
+            return message.reply("usuário não encontrato.")
                 .then(m => m.delete({timeout: 5 * 1000}));
         }
 
-        if (User.hasPermission("BAN_MEMBERS")) return message.reply("I cannot ban this user.").then(m => m.delete({timeout: 5 * 1000}));
+        if (User.hasPermission("BAN_MEMBERS")) return message.reply("eu não posso banir esse usuário.").then(m => m.delete({timeout: 5 * 1000}));
 
         message.channel.send(new MessageEmbed()
         
-        .setDescription(`Select a reason why the punishment can be applied to the user ${User}:\n\n\`#1\` - Disclosure of servers or links;\n\`#2\` - +18 content on public channels;\n\`#3\` - Infringement of a server policy (#rules)\n\`#4\` - Other reasons;\n\nTo apply the punishment to the user, enter the reason ID and the punishment will be applied. Then just confirm the ban!`)
+        .setDescription(`Selecione um motivo para que a punição possa ser aplicada ao usuário ${User}:\n\n\`#1\` - Divulgação de servidores ou links;\n\`#2\` - Conteúdo +18 em canais públicos;\n\`#3\` - Infração de um regulamento do servidor (#regras)\n\`#4\` - Outros motivos;\n\nPara aplicar a punição ao usuário, digite o ID do motivo e a punição será aplicada. Depois, basta confirmar o banimento!`)
         .setColor("36393e")).then(async (msg) => {
             await msg.delete({ timeout: 15 * 1000 })
         })
 
         let br1 = message.channel.createMessageCollector(a => a.author.id == message.author.id, {
-            time: 60000 * 5,
             max: 1
           })
 
+          var ans = { "#1": "Divulgação de servidores ou links.", "#2": "Conteúdo +18 em canais públicos.", "#3": "Infração de um regulamento do servidor (#regras).", "#4": "Outros motivos." }
+
           br1.on('collect', async r => {
 
-        if(r.content.toLowerCase() === "#1") {
-            const banReason_1 = "Disclosure of servers or links"
+            const banReason = ans[r]
             const banEmbed = new MessageEmbed()
             
-            banEmbed.setAuthor(`Adventurer banned from the server!`, this.client.user.displayAvatarURL({ dynamic: true }), Avatar)
+            banEmbed.setAuthor(`Aventureiro(a) banido(a) do servidor!`, this.client.user.displayAvatarURL({ dynamic: true }), Avatar)
             banEmbed.setColor(orange)
-            banEmbed.setDescription(`\`\`\`\n- Adventurer: ${User.user.tag} (ID: ${User.id})\n- Staff: ${message.author.tag}\n- Reason: ${banReason_1}\`\`\``)
+            banEmbed.setDescription(`\`\`\`\n- Aventureiro(a): ${User.user.tag} (ID: ${User.id})\n- Autor da punição: ${message.author.tag}\n- Motivo: ${banReason_1}\`\`\``)
 
             const promptEmbed = new MessageEmbed()
             .setColor("36393e")
-            .setDescription(`A banning punishment will be applied to the adventurer ${User}, want to confirm?`)
+            .setDescription(`Será aplicado uma punição de banimento no(a) aventureiro(a) ${User}, deseja confirmar?`)
 
         await message.channel.send(promptEmbed).then(async msg => {
             const emoji = await promptMessage(msg, message.author, 30, ["✅", "❌"]);
@@ -72,119 +67,24 @@ module.exports = class extends Command {
             if (emoji === "✅") {
                 msg.delete();
 
-                User.ban({ reason: banReason_1 })
+                User.ban({ reason: banReason })
                     .catch(err => {
-                        if (err) return message.channel.send(`Error: ${err}`)
+                        if (err) return message.channel.send(`Erro: ${err}`)
                     });
 
+                if (settings.get(`${User.id}-bans_count`) !== "null") {
+                        settings.add(`${User.id}-bans_count`, 1);
+                     } else {
+                       settings.set(`${User.id}-bans_count`, 1);
+                     }
                 Channel.send(banEmbed);
             } else if (emoji === "❌") {
                 msg.delete();
 
-                message.reply(`process cancelled.`)
+                message.reply(`banimento cancelado.`)
                     .then(m => m.delete({timeout: 5000}));
-            }
+                }
+            }); 
         });
-    }
-
-        if(r.content.toLowerCase() === "#2") {
-            const banReason_2 = "+18 content on public channels"
-            const banEmbed = new MessageEmbed()
-            
-            banEmbed.setAuthor(`Adventurer banned from the server!`, this.client.user.displayAvatarURL({ dynamic: true }), Avatar)
-            banEmbed.setColor(orange)
-            banEmbed.setDescription(`\`\`\`\n- Adventurer: ${User.user.tag} (ID: ${User.id})\n- Staff: ${message.author.tag}\n- Reason: ${banReason_2}\`\`\``)
-
-            const promptEmbed = new MessageEmbed()
-            .setColor("36393e")
-            .setDescription(`A banning punishment will be applied to the adventurer ${User}, want to confirm?`)
-
-        await message.channel.send(promptEmbed).then(async msg => {
-            const emoji = await promptMessage(msg, message.author, 30, ["✅", "❌"]);
-
-            if (emoji === "✅") {
-                msg.delete();
-
-                User.ban({ reason: banReason_2 })
-                    .catch(err => {
-                        if (err) return message.channel.send(`Error: ${err}`)
-                    });
-
-                Channel.send(banEmbed);
-            } else if (emoji === "❌") {
-                msg.delete();
-
-                message.reply(`process cancelled.`)
-                    .then(m => m.delete({timeout: 5000}));
-            }
-        });
-    }
-
-        if(r.content.toLowerCase() === "#3") {
-            const banReason_3 = "Infringement of a server policy (#rules)"
-            const banEmbed = new MessageEmbed()
-            
-            banEmbed.setAuthor(`Adventurer banned from the server!`, this.client.user.displayAvatarURL({ dynamic: true }), Avatar)
-            banEmbed.setColor(orange)
-            banEmbed.setDescription(`\`\`\`\n- Adventurer: ${User.user.tag} (ID: ${User.id})\n- Staff: ${message.author.tag}\n- Reason: ${banReason_3}\`\`\``)
-
-            const promptEmbed = new MessageEmbed()
-            .setColor("36393e")
-            .setDescription(`A banning punishment will be applied to the adventurer ${User}, want to confirm?`)
-
-        await message.channel.send(promptEmbed).then(async msg => {
-            const emoji = await promptMessage(msg, message.author, 30, ["✅", "❌"]);
-
-            if (emoji === "✅") {
-                msg.delete();
-
-                User.ban({ reason: banReason_3 })
-                    .catch(err => {
-                        if (err) return message.channel.send(`Error: ${err}`)
-                    });
-
-                Channel.send(banEmbed);
-            } else if (emoji === "❌") {
-                msg.delete();
-
-                message.reply(`process cancelled.`)
-                    .then(m => m.delete({timeout: 5000}));
-            }
-        });
-    }
-
-        if(r.content.toLowerCase() === "#4") {
-            const banReason_4 = "Other reasons"
-            const banEmbed = new MessageEmbed()
-            
-            banEmbed.setAuthor(`Adventurer banned from the server1`, this.client.user.displayAvatarURL({ dynamic: true }), Avatar)
-            banEmbed.setColor(orange)
-            banEmbed.setDescription(`\`\`\`\n- Adventurer: ${User.user.tag} (ID: ${User.id})\n- Staff: ${message.author.tag}\n- Reason: ${banReason_4}\`\`\``)
-
-            const promptEmbed = new MessageEmbed()
-            .setColor("36393e")
-            .setDescription(`A banning punishment will be applied to the adventurer ${User}, want to confirm?`)
-
-        await message.channel.send(promptEmbed).then(async msg => {
-            const emoji = await promptMessage(msg, message.author, 30, ["✅", "❌"]);
-
-            if (emoji === "✅") {
-                msg.delete();
-
-                User.ban({ reason: banReason_4 })
-                    .catch(err => {
-                        if (err) return message.channel.send(`Error: ${err}`)
-                    });
-
-                Channel.send(banEmbed);
-            } else if (emoji === "❌") {
-                msg.delete();
-
-                message.reply(`process cancelled.`)
-                    .then(m => m.delete({timeout: 5000}));
-            }
-        });
-    }
-    });
     }
 }

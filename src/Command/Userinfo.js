@@ -1,9 +1,9 @@
-const Command = require('../structures/Command');
-const { MessageEmbed } = require('discord.js');
-const { orange } = require('../../config.json');
-const db = require('quick.db');
-const moment = require("moment")
-require("moment-duration-format")
+const Command = require('../structures/Command'),
+    { MessageEmbed } = require('discord.js'),
+    { orange } = require('../../config.json'),
+    settings = require('quick.db'),
+    moment = require("moment");
+        require("moment-duration-format")
 
 module.exports = class extends Command {
 
@@ -11,20 +11,14 @@ module.exports = class extends Command {
         super(...args, {
             aliases: ['userinfo'],
             enabled: true,
-            description: 'Command used to verify user information.',
-            category: 'Utility',
-            usage: '\`userinfo\`',
             guildOnly: false,
             ownerOnly: false,
-            nsfw: false,
-            args: false,
-            cooldown: 5000
         })
     }
 
     async run(message, args) {
-        var desc = db.fetch(`setdesc_${message.author.id}`)
-        if (desc === null) desc = 'Undefined.';
+        var desc = settings.fetch(`setdesc_${message.author.id}`)
+        if (desc === null) desc = 'Indefinido.';
 
         var avatar = message.author.displayAvatarURL({size: 2048, dynamic: true});
         var embed = new MessageEmbed();
@@ -41,9 +35,9 @@ module.exports = class extends Command {
 
 
         if (!message.mentions.users.first()) {
-            embed.setAuthor(`${membro.username}'s Profile information`, membro.displayAvatarURL({ dynamic: true }), avatar)
+            embed.setAuthor(`Informações do perfil de ${membro.username}`, membro.displayAvatarURL({ dynamic: true }), avatar)
             embed.setColor(orange)
-            embed.setDescription(`📀 Name: **${membro.username}**\n📋 ID: **${membro.id}**\n\n🔹 Level: \`System currently unavailable.\`\n🔸 XP: \`System currently unavailable.\`\n🪙 Coins: **0**\n\n:handbag: Badges: **${newbadges.join(", ") || "None"}**\n\n🔻 Description: \`\`\`asciidoc\n- ${desc}\`\`\`\n🔴 Infractions: \`\`\`asciidoc\n- System currently unavailable\`\`\`\n\n📆 Account created in: **${moment(membro.createdAt).format('LLL')}**\n:pushpin: Joined here in **${moment(membro.joinedAt).format('LLL')}**`)
+            embed.setDescription(`📀 Nome: **${membro.username}**\n📋 ID: **${membro.id}**\n\n🔹 Nível: \`Sistema indisponível no momento.\`\n🔸 XP: \`Sistema indisponível no momento.\`\n🪙 Coins: **0**\n\n:handbag: Badges: **${newbadges.join(", ") || "Nenhuma"}**\n\n🔻 Descrição: \`\`\`asciidoc\n- ${desc}\`\`\`\n🔴 Infrações: \`\`\`asciidoc\n- Sistema indisponível no momento.\`\`\`\n\n📆 Conta criada em: **${moment(membro.createdAt).format('LLL')}**\n:pushpin: Entrou aqui em: **${moment(membro.joinedAt).format('LLL')}**`)
             embed.setThumbnail(avatar)
 
             message.channel.send(embed);
@@ -51,8 +45,8 @@ module.exports = class extends Command {
             var user = message.mentions.users.first()
             var avatar = user.displayAvatarURL({size: 2048, dynamic: true});
 
-            var descc = db.fetch(`setdesc_${user.id}`)
-            if (descc === null) descc = 'Undefined';
+            var descc = settings.fetch(`setdesc_${user.id}`)
+            if (descc === null) descc = 'Indefinido.';
 
             let badges = await user.flags
         badges = await badges.toArray();
@@ -62,9 +56,9 @@ module.exports = class extends Command {
             newbadges.push(m.replace("_", " "))
     })
 
-            embed.setAuthor(`${user.username}'s Profile Information`, user.displayAvatarURL({ dynamic: true }), avatar)
+            embed.setAuthor(`Informações do perfil de ${user.username}`, user.displayAvatarURL({ dynamic: true }), avatar)
             embed.setColor(orange)
-            embed.setDescription(`📀 Name: **${user.username}**\n📋 ID: **${user.id}**\n\n🔹 Level: \`System currently unavailable.\`\n🔸 XP: \`System currently unavailable.\`\n🪙 Coins: **0**\n\n:handbag: Badges: **${newbadges.join(", ") || "None"}**\n\n🔻 Description: \`\`\`asciidoc\n- ${descc}\`\`\`\n🔴 Infractions: \`\`\`asciidoc\n- System currently unavailable.\`\`\`\n\n📆 Account created in: **${moment(user.createdAt).format('LLL')}**\n:pushpin: Joined here in: **${moment(user.joinedAt).format('LLL')}**`)
+            embed.setDescription(`📀 Nome: **${user.username}**\n📋 ID: **${user.id}**\n\n🔹 Nível: \`Sistema indisponível no momento.\`\n🔸 XP: \`Sistema indisponível no momento.\`\n🪙 Coins: **0**\n\n:handbag: Badges: **${newbadges.join(", ") || "Nenhuma"}**\n\n🔻 Descrição: \`\`\`asciidoc\n- ${descc}\`\`\`\n🔴 Infrações: \`\`\`asciidoc\n- Sistema indisponível no momento.\`\`\`\n\n📆 Conta criada em: **${moment(user.createdAt).format('LLL')}**\n:pushpin: Entrou aqui em: **${moment(user.joinedAt).format('LLL')}**`)
             embed.setThumbnail(avatar)
 
             message.channel.send(embed);

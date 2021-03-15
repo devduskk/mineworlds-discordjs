@@ -1,7 +1,7 @@
 {
-  "name": "mineworlds",
+  "name": "BhowkMC",
   "version": "1.0.0",
-  "description": "MineWorlds Official Robot",
+  "description": "BhowkMC Official Robot",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -17,6 +17,7 @@
     "moment-duration-format": "^2.3.2",
     "path": "^0.12.7",
     "quick.db": "^7.1.3",
+    "sourcebin_js": "0.0.3-ignore",
     "util": "^0.12.3"
   }
 }

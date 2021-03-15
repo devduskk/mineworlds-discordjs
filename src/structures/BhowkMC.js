@@ -1,7 +1,7 @@
 const { Client, Collection, Permissions } = require('discord.js');
 const Util = require('./Util.js');
 
-module.exports = class MineWorlds extends Client {
+module.exports = class BhowkMC extends Client {
 
 	constructor(options = {}) {
 		super({

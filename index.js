@@ -1,5 +1,5 @@
-const client = require('./src/structures/MineWorlds');
+const client = require('./src/structures/BhowkMC');
 const config = require('./config.json');
 
-const mineworlds = new client(config);
-mineworlds.start();
+const BhowkMC = new client(config);
+BhowkMC.start();

@@ -1,9 +1,9 @@
-const Command = require('../structures/Command');
-const { MessageEmbed } = require('discord.js');
-const db = require('quick.db');
-const moment = require("moment")
-require("moment-duration-format")
-moment.locale("en-US")
+const Command = require('../structures/Command'),
+    { MessageEmbed } = require('discord.js'),
+    settings = require('quick.db'),
+    moment = require("moment");
+        require("moment-duration-format")
+        moment.locale("pt-BR")
 
 module.exports = class extends Command {
 
@@ -11,30 +11,24 @@ module.exports = class extends Command {
         super(...args, {
             aliases: ['serverinfo'],
             enabled: true,
-            description: 'Command used to verify server information.',
-            category: 'Utility',
-            usage: '\`serverinfo\`',
             guildOnly: false,
             ownerOnly: false,
-            nsfw: false,
-            args: false,
-            cooldown: 5000
         })
     }
 
     async run(message, args) {
 
-        var desc = db.fetch(`svdesc_${message.guild.id}`)
-        if (desc === null) desc = 'Undefined.';
+        var desc = settings.fetch(`svdesc_${message.guild.id}`)
+        if (desc === null) desc = 'A descrição ainda não foi definida.';
 
         let canaistexto = message.guild.channels.cache.filter(a => a.type === "text").size;
         let canaisvoz = message.guild.channels.cache.filter(a => a.type === "voice").size;
 
         const serverinfo = new MessageEmbed()
 
-        serverinfo.setAuthor(`Click here to be redirected to the site`, this.client.user.displayAvatarURL({ dynamic: true }), 'WEBSITE LINK HERE')
+        serverinfo.setAuthor(`Clique aqui para ser redirecionado ao site do BhowkMC`, this.client.user.displayAvatarURL({ dynamic: true }), 'https://shop.bhwokmc.com.br/')
         serverinfo.setColor("#ffbb00")
-        serverinfo.setDescription(`📀 Server Name: **${message.guild.name}**\n📋 ID: **${message.guild.id}**\n\n:crown: Created by: ${message.guild.owner} (**ID**: ${message.guild.owner.id})\n👥 Number of members: **${message.guild.memberCount} members**\n💬 Number of channels: **${canaistexto + canaisvoz} channels**\n\n🔻 **Description of the server**: \`\`\`asciidoc\n* ${desc}\`\`\`\n:calendar: You joined here in: **${moment(message.member.joinedAt).format(`LLL`)}**\n:pushpin: I joined here in: **${moment(this.client.user.joinedAt).format(`LLL`)}**`)
+        serverinfo.setDescription(`📀 Nome: **${message.guild.name}**\n📋 ID: **${message.guild.id}**\n\n:crown: Criado por: ${message.guild.owner} (**ID**: ${message.guild.owner.id})\n👥 Quantidade de membros: **${message.guild.memberCount} membros**\n💬 Quantidade de canais: **${canaistexto + canaisvoz} canais**\n\n🔻 **Descrição do servidor**: \`\`\`asciidoc\n* ${desc}\`\`\`\n:calendar: Você entrou aqui em: **${moment(message.member.joinedAt).format(`LLL`)}**\n:pushpin: Eu entrei aqui em: **${moment(this.client.user.joinedAt).format(`LLL`)}**`)
         serverinfo.setThumbnail(this.client.user.displayAvatarURL({ dynamic: true }))
         
 

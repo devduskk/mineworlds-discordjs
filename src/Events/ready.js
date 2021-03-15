@@ -11,17 +11,13 @@ module.exports = class extends Event {
 
     async run() {
 
-        const activities = [
-            `🛒 shop.mineworlds.com.br`,
-            `play.mineworlds.com.br 🎮`,
-            `👥 ${this.client.guilds.cache.reduce((a, b) => a + b.memberCount, 0)} adventurers!`
-        ];
+        const activities = [`🛒 shop.bhowkmc.com.br`, `play.bhowkmc.com.br 🎮`, `👥 ${this.client.guilds.cache.reduce((a, b) => a + b.memberCount, 0)} aventureiros(a)!`];
     
         let i = 0;
         setInterval(() => this.client.user.setActivity(`${activities[i++ % activities.length]}`, { type: 'WATCHING' }), 15000);
 
         console.log([
-            `Successfully authenticated!`,
+            `Online!`,
 			`Commands: ${this.client.commands.map(cmd => cmd.name).join(', ')}`,
 			`Events: ${this.client.events.map(evt => evt.name).join(', ')}`
         ].join(`\n`));

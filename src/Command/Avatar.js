@@ -1,5 +1,5 @@
-const Command = require('../structures/Command');
-const { MessageEmbed } = require('discord.js');
+const Command = require('../structures/Command'),
+    { MessageEmbed } = require('discord.js');
 
 module.exports = class extends Command {
 
@@ -7,14 +7,8 @@ module.exports = class extends Command {
         super(...args, {
             aliases: ['avatar'],
             enabled: true,
-            description: 'Command used to verify a user's avatar.',
-            category: 'Utility',
-            usage: '\`avatar\`',
             guildOnly: false,
             ownerOnly: false,
-            nsfw: false,
-            args: false,
-            cooldown: 5000
         })
     }
 
@@ -24,7 +18,7 @@ module.exports = class extends Command {
 
         if (!message.mentions.users.first()){
 
-            embed.setAuthor(`Click here to download the image of ${message.author.username}'s`, message.author.displayAvatarURL({ dynamic: true }), avatar)
+            embed.setAuthor(`Clique aqui para baixar a imagem de ${message.author.tag}`, message.author.displayAvatarURL({ dynamic: true }), avatar)
             embed.setImage(avatar)
             embed.setColor("#ffbb00")
 
@@ -35,7 +29,7 @@ module.exports = class extends Command {
             const user = message.mentions.users.first()
             let avatar = user.displayAvatarURL({size: 2048, dynamic: true});
 
-            embed.setAuthor(`Click here to download the image of ${user.username}'s`, user.displayAvatarURL({ dynamic: true }), avatar)
+            embed.setAuthor(`Clique aqui para baixar a imagem de ${user.tag}`, user.displayAvatarURL({ dynamic: true }), avatar)
             embed.setImage(avatar)
             embed.setColor("#ffbb00")
 
